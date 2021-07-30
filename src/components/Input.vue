@@ -14,14 +14,14 @@
         id="checkbox1" 
         class="form-check-input" 
         value="urgente" 
-        v-model="tarea.urgente"
+        v-model="tarea.estado"
         >
       <label for="checkbox1" class="form-check-label" >Urgente</label>    
 
       <input type="radio" id="checkbox2" 
         class="form-check-input ml-2" 
         value="relax" 
-        v-model="tarea.urgente"
+        v-model="tarea.estado"
         >
       <label for="checkbox2" class="form-check-label" >Relax</label>   
     </div>
