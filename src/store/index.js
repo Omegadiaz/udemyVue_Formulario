@@ -18,11 +18,12 @@ export default createStore({
     },
     set(state, payload){
       state.tareas.push(payload)
-      localStorage.setItem('tareas', JSON.stringify(state.tareas))
+      
     },
-    eliminar(state, payload){
+    async eliminar(state, payload){
       state.tareas = state.tareas.filter(item => item.id != payload)
-      localStorage.setItem('tareas', JSON.stringify(state.tareas))
+      
+      
     },
     tarea(state, payload){
       if(!state.tareas.find(item => item.id === payload)){
@@ -38,25 +39,58 @@ export default createStore({
     }
   },
   actions: {
-    cargarLocalStorage({ commit }){
-      if(localStorage.getItem('tareas')){
-        const tareas = JSON.parse(localStorage.getItem('tareas'))
-        commit('cargar', tareas)
-        return
+    async cargarLocalStorage({ commit }){
+      try {
+        const res = await fetch(`https://udemy-vue-4d53f-default-rtdb.europe-west1.firebasedatabase.app/tareas.json`)
+        const dataDB = await res.json()
+        const arrayTareas = Object.values(dataDB)
+        commit('cargar', arrayTareas)
+      } catch (error) {
+        console.log(error)
       }
-        localStorage.setItem('tareas', JSON.stringify([]))
       
     },
-    setTareas({ commit }, tarea){
+    async setTareas({ commit }, tarea){
+      try {
+        const res = await fetch(`https://udemy-vue-4d53f-default-rtdb.europe-west1.firebasedatabase.app/tareas/${tarea.id}.json`, {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(tarea)
+        })
+        const dataDB = await res.json()
+        console.log(dataDB)
+      } catch (error) {
+        console.log(error)
+      }
       commit('set', tarea)
     },
     deleteTareas({ commit }, id){
+      try {
+        fetch(`https://udemy-vue-4d53f-default-rtdb.europe-west1.firebasedatabase.app/tareas/${payload}.json`, {
+          method: 'DELETE'
+        })
+      }catch (error){
+        console.log(error)
+      }
       commit('eliminar', id)
     },
     setTarea({ commit }, id){
       commit('tarea', id)
     },
-    updateTarea({ commit }, tarea){
+    async updateTarea({ commit }, tarea){
+      try {
+        const res = await fetch(`https://udemy-vue-4d53f-default-rtdb.europe-west1.firebasedatabase.app/tareas/${tarea.id}.json`, {
+          method: 'PATCH',
+          body: JSON.stringify(tarea),
+          headers: {
+            'Content-Type': 'application/json'
+          }          
+        })
+      }catch (error){
+        console.log(error)
+      }
       commit('update', tarea)
     }
   },
