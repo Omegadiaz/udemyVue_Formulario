@@ -1,6 +1,7 @@
 <template>
   <h1>Registrar nuevo usuario:</h1>
-  <form class="form-group">
+  <form class="form-group" 
+        @submit.prevent="procesarFormulario">
       <input 
       class="form-control  my-2" 
       placeholder="email" 
@@ -26,6 +27,7 @@
 </template>
 
 <script>
+import { mapActions } from 'vuex'
 export default {
   data(){
     return{
@@ -44,6 +46,19 @@ export default {
       }      
       return true
     }
+    
+    },
+    methods: {
+      ...mapActions(['registrarUsuario']),
+      procesarFormulario(){
+        this.registrarUsuario({
+          email: this.email,
+          password: this.password1
+          })
+          this.email = ''
+          this.password1 = ''
+          this.password2 = ''
+      }      
   }
 }
 </script>

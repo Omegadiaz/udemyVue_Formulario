@@ -11,8 +11,12 @@ export default createStore({
       estado: '',
       numero: ''
     },
+    user: null
   },
   mutations: {
+    setUser(state, payload){
+      state.user = payload
+    },
     cargar(state, payload){
       state.tareas = payload
     },
@@ -39,6 +43,9 @@ export default createStore({
     }
   },
   actions: {
+    async registrarUsuario({ commit }, usuario){
+      console.log(usuario)
+    },
     async cargarLocalStorage({ commit }){
       try {
         const res = await fetch(`https://udemy-vue-4d53f-default-rtdb.europe-west1.firebasedatabase.app/tareas.json`)
