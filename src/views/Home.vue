@@ -34,7 +34,7 @@ export default {
     }
   },
   methods : {
-    ...mapActions(['setTareas']),
+    ...mapActions(['setTareas', 'cargarLocalStorage']),
     procesarFormulario(){      
       if(this.tarea.nombre.trim() === "" | " "){
         console.log('Datos incompletos');
@@ -43,7 +43,7 @@ export default {
       }
       ///generar ID ///
       this.tarea.id = shortid.generate();
-      console.log(this.tarea.id);
+      //console.log(this.tarea.id);
 
       //Se envian los datos
       this.setTareas(this.tarea)
@@ -58,5 +58,8 @@ export default {
       }
     }
   },
+  created(){
+    this.cargarLocalStorage()
+  }
  }
 </script>

@@ -14,10 +14,12 @@ export default createStore({
     user: null
   },
   mutations: {
-    setUser(state, payload){
+    async setUser(state, payload){
       state.user = payload
+      router.push('/')
+      return
     },
-    cargar(state, payload){
+    async cargar(state, payload){
       state.tareas = payload
     },
     set(state, payload){
@@ -43,12 +45,60 @@ export default createStore({
     }
   },
   actions: {
-    async registrarUsuario({ commit }, usuario){
+    async ingresoUsuario({ commit }, usuario){
       console.log(usuario)
-    },
-    async cargarLocalStorage({ commit }){
       try {
-        const res = await fetch(`https://udemy-vue-4d53f-default-rtdb.europe-west1.firebasedatabase.app/tareas.json`)
+        const res = await fetch(`https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key=AIzaSyA90aiO0JEaSYB4zQuIWyzs1lAz0TNuhGw`, {
+          method: 'POST',
+          body: JSON.stringify({
+            email: usuario.email,
+            password: usuario.password,
+            returnSecureToken: true
+          })
+        })
+        const userDB = await res.json()
+        if(userDB.error){
+          console.log(userDB.error)
+          return
+        }
+        commit('setUser', userDB)
+      } catch (error) {
+        console.log(error)
+      }
+    },
+    cerrarSesion({commit}){
+      commit('setUser', null)
+      router.push('/login')
+    },
+    async registrarUsuario({ commit }){
+      console.log(usuario)
+      try {
+        const res = await fetch(`https://identitytoolkit.googleapis.com/v1/accounts:signUp?key=AIzaSyA90aiO0JEaSYB4zQuIWyzs1lAz0TNuhGw`, {
+          method: 'POST',
+          body: 
+            JSON.stringify({
+              email: usuario.email,
+              password: usuario.password,
+              returnSecureToken: true
+            })          
+        })
+        const userDB = await res.json()
+        
+        if(userDB.error){
+          console.log(error)
+          return
+        }
+        commit('setUser', user)
+        router.push('/')
+      } catch (error) {
+        console.log(error)
+      }
+    },
+
+    async cargarLocalStorage({ commit, state }){
+      console.log(state)
+      try {
+        const res = await fetch(`https://udemy-vue-4d53f-default-rtdb.europe-west1.firebasedatabase.app/tareas/${state.user.localId}.json?auth=${state.user.idToken}`)
         const dataDB = await res.json()
         const arrayTareas = Object.values(dataDB)
         commit('cargar', arrayTareas)
@@ -57,9 +107,9 @@ export default createStore({
       }
       
     },
-    async setTareas({ commit }, tarea){
+    async setTareas({ commit, state }, tarea){
       try {
-        const res = await fetch(`https://udemy-vue-4d53f-default-rtdb.europe-west1.firebasedatabase.app/tareas/${tarea.id}.json`, {
+        const res = await fetch(`https://udemy-vue-4d53f-default-rtdb.europe-west1.firebasedatabase.app/tareas/${state.user.localId}/${tarea.id}.json?auth=${state.user.idToken}`, {
           method: 'PUT',
           headers: {
             'Content-Type': 'application/json'
@@ -73,9 +123,9 @@ export default createStore({
       }
       commit('set', tarea)
     },
-    deleteTareas({ commit }, id){
+    async deleteTareas({ commit, state }, id){
       try {
-        fetch(`https://udemy-vue-4d53f-default-rtdb.europe-west1.firebasedatabase.app/tareas/${payload}.json`, {
+        fetch(`https://udemy-vue-4d53f-default-rtdb.europe-west1.firebasedatabase.app/tareas/${state.user.localId}/${id}.json?auth=${state.user.idToken}`, {
           method: 'DELETE'
         })
       }catch (error){
@@ -86,9 +136,9 @@ export default createStore({
     setTarea({ commit }, id){
       commit('tarea', id)
     },
-    async updateTarea({ commit }, tarea){
+    async updateTarea({ commit, state }, tarea){
       try {
-        const res = await fetch(`https://udemy-vue-4d53f-default-rtdb.europe-west1.firebasedatabase.app/tareas/${tarea.id}.json`, {
+        const res = await fetch(`https://udemy-vue-4d53f-default-rtdb.europe-west1.firebasedatabase.app/tareas/${state.user.localId}/${tarea.id}.json?auth=${state.user.idToken}`, {
           method: 'PATCH',
           body: JSON.stringify(tarea),
           headers: {
@@ -102,5 +152,10 @@ export default createStore({
     }
   },
   modules: {
+  },
+  getters: {
+    usuarioAutenticado(state){
+      return !!state.user 
+    }
   }
 })

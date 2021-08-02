@@ -8,12 +8,6 @@ import {mapActions} from 'vuex'
 export default {
   components: {
     Navbar
-  },
-  methods: {
-    ...mapActions(['cargarLocalStorage'])
-  },
-  created(){
-    this.cargarLocalStorage()
   }
 }
 </script>

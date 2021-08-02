@@ -1,6 +1,6 @@
 <template>
 <h1>Inicio de sesión</h1>
-  <form class="form-group" @submit.prevent="registrarUsuario({email: this.email, password: this.password})">
+  <form class="form-group" @submit.prevent="ingresoUsuario({email: this.email, password: this.password})">
       <input 
       class="form-control  my-2" 
       placeholder="email" 
@@ -10,12 +10,12 @@
       <input class="form-control  my-2" 
       placeholder="password" 
       type="password"
-      v-model.trim="password1"/>
+      v-model.trim="password"/>
 
       <button 
       type="submit"
       class="btn btn-primary"
-      :disabled="bloquear"
+      
         >Confirmar</button>
   </form>
 </template>
@@ -27,13 +27,13 @@ import { mapActions } from 'vuex'
 export default {
   data(){
     return{
-      email: '',
-      password: '',
+      email: 'unofalso@gmail.com',
+      password: '123456',
     }
   },
     
     methods: {
-      ...mapActions(['registrarUsuario'])
+      ...mapActions(['ingresoUsuario'])
   }
  }
 </script>
