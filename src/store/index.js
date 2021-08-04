@@ -46,7 +46,6 @@ export default createStore({
   },
   actions: {
     async ingresoUsuario({ commit }, usuario){
-      console.log(usuario)
       try {
         const res = await fetch(`https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key=AIzaSyA90aiO0JEaSYB4zQuIWyzs1lAz0TNuhGw`, {
           method: 'POST',
@@ -62,16 +61,18 @@ export default createStore({
           return
         }
         commit('setUser', userDB)
+        localStorage.setItem('usuario', JSON.stringify(userDB))
+        
       } catch (error) {
         console.log(error)
       }
     },
     cerrarSesion({commit}){
       commit('setUser', null)
+      localStorage.removeItem('usuario')
       router.push('/login')
     },
-    async registrarUsuario({ commit }){
-      console.log(usuario)
+    async registrarUsuario({ commit }, usuario){      
       try {
         const res = await fetch(`https://identitytoolkit.googleapis.com/v1/accounts:signUp?key=AIzaSyA90aiO0JEaSYB4zQuIWyzs1lAz0TNuhGw`, {
           method: 'POST',
@@ -88,7 +89,8 @@ export default createStore({
           console.log(error)
           return
         }
-        commit('setUser', user)
+        commit('setUser', userDB)
+        localStorage.setItem('usuario', JSON.stringify(userDB))
         router.push('/')
       } catch (error) {
         console.log(error)
@@ -96,12 +98,27 @@ export default createStore({
     },
 
     async cargarLocalStorage({ commit, state }){
-      console.log(state)
+      if(localStorage.getItem('usuario')){
+        commit('setUser', JSON.parse(localStorage.getItem('usuario')))
+        router.push('/')        
+      }else{
+        console.log('digo que no hay por que soy gilipollas')
+        return commit('setUser', null)
+      }
       try {
         const res = await fetch(`https://udemy-vue-4d53f-default-rtdb.europe-west1.firebasedatabase.app/tareas/${state.user.localId}.json?auth=${state.user.idToken}`)
         const dataDB = await res.json()
-        const arrayTareas = Object.values(dataDB)
-        commit('cargar', arrayTareas)
+        let arrayTareas = null
+        if(dataDB){
+          arrayTareas = Object.values(dataDB) 
+          commit('cargar', arrayTareas)
+          return
+        }else{
+          arrayTareas = []
+        }
+        
+       
+        
       } catch (error) {
         console.log(error)
       }
@@ -117,7 +134,7 @@ export default createStore({
           body: JSON.stringify(tarea)
         })
         const dataDB = await res.json()
-        console.log(dataDB)
+        
       } catch (error) {
         console.log(error)
       }
@@ -150,8 +167,6 @@ export default createStore({
       }
       commit('update', tarea)
     }
-  },
-  modules: {
   },
   getters: {
     usuarioAutenticado(state){

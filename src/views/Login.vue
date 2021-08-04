@@ -27,13 +27,13 @@ import { mapActions } from 'vuex'
 export default {
   data(){
     return{
-      email: 'unofalso@gmail.com',
-      password: '123456',
+      email: '',
+      password: '',
     }
   },
     
     methods: {
-      ...mapActions(['ingresoUsuario'])
+      ...mapActions(['ingresoUsuario', 'cargarLocalStorage'])
   }
  }
 </script>
